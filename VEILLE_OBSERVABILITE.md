@@ -110,3 +110,5 @@ P95 (95e percentile) signifie que 95 % des requêtes ont un temps de réponse in
 - Calculer la latence P95 des requêtes DB :
 ``histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m]))``
 
+
+### Phase 3 : Dashboard Grafana
