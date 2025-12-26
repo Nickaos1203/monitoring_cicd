@@ -1,3 +1,5 @@
+# Phase 1 : Instrumantation FastApi
+
 ## Mission 1 : Comprendre PromQL
 
 ### Questions à explorer :
@@ -54,17 +56,57 @@ On utilise des labels lorsque l'on souhaite mesurer la même chose mais sous des
 - Traces : suivi complet d’une requête à travers plusieurs services
 
 **❓ Quel type de métrique pour compter les requêtes HTTP ?**
-Un Counter ne fait qu’augmenter et sert à compter des événements comme :
-- le nombre total de requêtes HTTP
-- le nombre d’erreurs
-- le nombre d’actions utilisateur
+Le Counter.
 
 **❓ Quel type de métrique pour l'utilisation RAM actuelle ?**
-Un Gauge représente une valeur instantanée qui peut monter ou descendre, comme :
-- l’utilisation mémoire
-- l’utilisation CPU
-- le nombre de connexions actives
+Le Gauge.
 
 **❓ Que signifie P95 ?**
 P95 (95e percentile) signifie que 95 % des requêtes ont un temps de réponse inférieur ou égal à cette valeur, et que 5 % sont plus lentes.
+
+# Phase 2 : Set up Prometheus & PromQL 
+
+## Requête à maitriser
+
+- **Métrique brute** : affiche le nombre total d'items créés
+    - items_created_total
+
+- **Taux par seconde (moyenne 5min)** : calcul le taux moyen de création d'items par seconde sur les 5 dernières minutes
+    - rate(items_created_total[5m])
+
+- **Total requêtes HTTP/s** : calcul le nombre total de requêtes HTTP par seconde reçu par l'application, toutes routes confondues
+    - sum(rate(http_requests_total[5m]))
+
+- **Requêtes par endpoint** : affiche le nombre de requêtes par seconde pour chaque endpoint
+    - sum(rate(http_requests_total[5m])) by (handler)
+
+- **Latence P95** : calcule la latence P95 des requêtes HTTP sur les 5 dernières minutes
+    - histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+- **Taux d'erreur en %** : calcule le pourcentage de requêtes HTTP en erreur serveur
+    - (sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))) * 100
+
+
+## Exercice 1 : Métriques basiques
+
+- Afficher le nombre total d'items supprimés :
+``items_deleted_total``
+- Calculer le taux de lecture par seconde (moyenne 5min) :
+``rate(items_read_total[5m])``
+- Trouver le nombre total de requêtes HTTP reçues :
+``sum(http_requests_total)``
+
+## Exercice 2 : Agrégations
+- Calculer le total de toutes les opérations CRUD :
+``sum(items_created_total + items_read_total + items_updated_total + items_deleted_total)``
+- Afficher les requêtes HTTP par méthode (GET, POST, etc.) :
+``sum(rate(http_requests_total[5m])) by (method)``
+
+## Exercice 3 : Percentiles
+- Calculer la latence P50 (médiane) :
+``histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))``
+- Calculer la latence P99 :
+``histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))``
+- Calculer la latence P95 des requêtes DB :
+``histogram_quantile(0.95, rate(db_query_duration_seconds_bucket[5m]))``
 
