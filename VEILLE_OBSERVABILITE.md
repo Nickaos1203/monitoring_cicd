@@ -35,6 +35,36 @@ Un nom de métriques doit :
 - devrait représenter la même logique mesurée pour toutes les dimensions d'étiquettes (label).
 
 **Quand utiliser des labels vs créer plusieurs métriques ?**
+On utilise des labels lorsque l'on souhaite mesurer la même chose mais sous des variantes différentes. A l'inverse, on utilise plusieurs lorsque ce sont des choses différentes.
 
 
 **Quels sont les dashboards anti-patterns à éviter ?**
+- Trop de panels inutiles
+- Dashboards sans objectif clair
+- Absence d’unités et de seuils
+
+### Quiz :
+**❓ Monitoring vs Observabilité : quelle différence ?**
+- Monitoring : permet de savoir quand un problème survient (service down, latence élevée, alerte déclenchée).
+- Observabilité : permet de comprendre pourquoi le problème survient en analysant les métriques, logs et traces.
+
+**❓ Citez les 3 piliers de l'observabilité**
+- Métriques : valeurs numériques agrégées dans le temps (CPU, latence, requêtes/seconde)
+- Logs : événements textuels horodatés (erreurs, messages applicatifs)
+- Traces : suivi complet d’une requête à travers plusieurs services
+
+**❓ Quel type de métrique pour compter les requêtes HTTP ?**
+Un Counter ne fait qu’augmenter et sert à compter des événements comme :
+- le nombre total de requêtes HTTP
+- le nombre d’erreurs
+- le nombre d’actions utilisateur
+
+**❓ Quel type de métrique pour l'utilisation RAM actuelle ?**
+Un Gauge représente une valeur instantanée qui peut monter ou descendre, comme :
+- l’utilisation mémoire
+- l’utilisation CPU
+- le nombre de connexions actives
+
+**❓ Que signifie P95 ?**
+P95 (95e percentile) signifie que 95 % des requêtes ont un temps de réponse inférieur ou égal à cette valeur, et que 5 % sont plus lentes.
+

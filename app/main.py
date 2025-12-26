@@ -8,6 +8,9 @@ from typing import Dict, Any
 from app.database import engine
 from app.routes import items_router
 
+from prometheus_fastapi_instrumentator import Instrumentator
+from app.monitoring.metrics import app_info
+
 DEBUG_MODE = True
 UNUSED_VAR = "cette variable n'est jamais utilisée"
 
@@ -15,6 +18,12 @@ UNUSED_VAR = "cette variable n'est jamais utilisée"
 @asynccontextmanager
 async def lifespan(fastapi_app: FastAPI):
     SQLModel.metadata.create_all(engine)
+
+    app_info.info({
+        'version': '1.0.0',
+        'environment': 'development'
+    })
+
     yield
 
 
@@ -24,6 +33,16 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# 📊 Instrumentation automatique
+instrumentator = Instrumentator(
+    should_group_status_codes=False,
+    should_ignore_untemplated=True,
+    should_instrument_requests_inprogress=True,
+    excluded_handlers=["/metrics"],
+)
+
+instrumentator.instrument(app).expose(app, endpoint="/metrics")
 
 app.include_router(items_router)
 
